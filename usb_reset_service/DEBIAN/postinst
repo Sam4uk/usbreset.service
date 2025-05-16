@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo systemctl daemon-reload
+sudo systemctl enable usb_reset_service.service
+sudo systemctl start usb_reset_service.service

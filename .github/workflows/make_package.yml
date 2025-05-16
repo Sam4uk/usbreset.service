@@ -1,0 +1,33 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    #- name: configure
+    #  run: ./configure
+    - name: make
+      run: make
+    #- name: make check
+    #  run: make check
+    #- name: make distcheck
+    #  run: make distcheck
+    - name: LS
+      run: ls
+    - name: Upload DEB package
+      uses: actions/upload-artifact@v4
+      with:
+        name: deb-package
+        path: |
+            "oculos_*.deb"
+            "oculos_*.zip"
+        retention-days: 5

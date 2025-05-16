@@ -1,0 +1,11 @@
+[Unit]
+Description=Force reconnect USB Ethernet
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sleep 5;  /usr/bin/echo "OK";  /usr/bin/usbreset; /bin/sleep 5; /usr/bin/usbreset;
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
