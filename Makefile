@@ -1,5 +1,5 @@
 project_name := usbresetservice
-project_version := 0.1.1
+project_version := 0.1.2
 project_arch := all
 
 
