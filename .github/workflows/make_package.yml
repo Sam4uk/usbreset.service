@@ -17,10 +17,10 @@ jobs:
       run: cmake -B build
     - name: make
       run: cmake --build build
-    #- name: make check
-    #  run: make check
-    #- name: make distcheck
-    #  run: make distcheck
+    - name: cpack
+      run: cpack --config ./build/CPackConfig.cmake -G DEB 
+    # - name: make distcheck
+    #   run: make distcheck
     - name: LS
       run: tree
     - name: Upload DEB package
