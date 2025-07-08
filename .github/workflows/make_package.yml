@@ -22,7 +22,7 @@ jobs:
     # - name: make distcheck
     #   run: make distcheck
     - name: LS
-      run: tree
+      run: tree ..
     - name: Upload DEB package
       uses: actions/upload-artifact@v4
       with:
