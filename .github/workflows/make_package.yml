@@ -28,6 +28,6 @@ jobs:
       with:
         name: deb-package
         path: |
-            "oculos_*.deb"
-            "oculos_*.zip"
+            "usbresetservice*.deb"
+        # "oculos_*.zip"
         retention-days: 5
