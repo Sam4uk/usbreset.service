@@ -1,5 +1,5 @@
 project_name := usbresetservice
-project_version := 0.1.2
+project_version := 0.1.3
 project_arch := all
 
 
@@ -19,7 +19,7 @@ ${source}/DEBIAN/control: $(files)
 	@echo "Section: custom" >> ${source}/DEBIAN/control
 	@echo "Maintainer: sam4uk.github.io" >> ${source}/DEBIAN/control
 	@echo "Description: sam4uk.github.io" >> ${source}/DEBIAN/control
-	@echo "Depends: vim" >> ${source}/DEBIAN/control
+	@echo "Depends: libc6 (>= 2.28)" >> ${source}/DEBIAN/control
 
 # ${project}.zip: $(files)
 # 	echo "Оновлення zip"

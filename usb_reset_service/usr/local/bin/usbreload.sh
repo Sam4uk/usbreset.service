@@ -9,8 +9,9 @@ sleep 5
 
 for DEVICE in "${DEVICE_LIST[@]}"; do
     echo "usbreset ${DEVICE}"
-    sudo usbreset ${DEVICE}
+    sudo udevadm trigger --action=change --subsystem-match=usb \
+    --attr-match idVendor=$(echo "$DEVICE" | awk '{print $1}') --attr-match idProduct=$(echo "$DEVICE" | awk '{print $2}')
     sleep 5
 done
-usbreset
+
 
