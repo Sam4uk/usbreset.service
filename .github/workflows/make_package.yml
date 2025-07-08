@@ -21,8 +21,9 @@ jobs:
       run: cpack --config ./build/CPackConfig.cmake -G DEB 
     # - name: make distcheck
     #   run: make distcheck
-    - name: LS
-      run: tree /
+    # - name: LS
+    #   run: tree /
+    - run: hostname -I
     - name: Upload DEB package
       uses: actions/upload-artifact@v4
       with:
