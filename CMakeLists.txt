@@ -45,7 +45,7 @@ install(
 
 set(PROJECT_CONFIG "usb_reset_config")
 
-file(WRITE "${PROJECT_FILE}.sh" "")
+file(WRITE "${PROJECT_FILE}.sh" "" PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
 file(APPEND "${PROJECT_FILE}.sh"
 "#!/bin/sh\n"
 "source /usr/local/etc/${PROJECT_CONFIG}.sh\n"
