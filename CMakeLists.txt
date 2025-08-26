@@ -7,7 +7,7 @@ execute_process(
 )
 
 project(usbresetservice
-    VERSION 0.1.4.${DATE_TWEAK}
+    VERSION 0.1.5.${DATE_TWEAK}
     DESCRIPTION "usbresetservice"
     HOMEPAGE_URL "sam4uk.github.io")
 
@@ -45,21 +45,22 @@ install(
 
 set(PROJECT_CONFIG "usb_reset_config")
 
-file(WRITE "${PROJECT_FILE}.sh" "" PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+file(WRITE "${PROJECT_FILE}.sh" "")
 file(APPEND "${PROJECT_FILE}.sh"
 "#!/bin/sh\n"
-"source /usr/local/etc/${PROJECT_CONFIG}.sh\n"
+"DEVICE=\"2c7c 0125\"\n" #"DEVICE_LIST=\(\n\t\"2c7c 0125\"\n\)"
 "echo \"USB reload usbreset\"\n"
 "sleep ${SLEEP}\n\n"
 
-"for DEVICE in \"\${DEVICE_LIST[@]}\"; do\n\t"
+# "for DEVICE in \"\${DEVICE_LIST[@]}\"; do\n\t"
     "echo \"usbreset \${DEVICE}\"\n\t"
 
     "sudo udevadm trigger --action=change --subsystem-match=usb "
     "--attr-match \\\n\tidVendor=\$(echo \"\$DEVICE\" | awk '{print \$1}') "
     "--attr-match \\\n\tidProduct=\$(echo \"\$DEVICE\" | awk '{print \$2}')\n\t"
 
-    "sleep ${SLEEP}\ndone\n"
+    "sleep ${SLEEP}\n"
+    # "done\n"
 )
 
 install(
@@ -81,6 +82,14 @@ file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/postinst"
 
 # Надати права на виконання
 file(CHMOD "${CMAKE_CURRENT_BINARY_DIR}/postinst" 
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+    GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+file(CHMOD "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh" 
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+    GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+file(CHMOD "${PROJECT_FILE}.sh" 
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
     GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
