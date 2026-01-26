@@ -7,7 +7,7 @@ execute_process(
 )
 
 project(usbresetservice
-    VERSION 0.1.5.${DATE_TWEAK}
+    VERSION 0.1.6.${DATE_TWEAK}
     DESCRIPTION "usbresetservice"
     HOMEPAGE_URL "sam4uk.github.io")
 
@@ -24,8 +24,7 @@ file(WRITE ${PROJECT_BINARY_DIR}/.gitignore
 )
 
 
-file(WRITE "${PROJECT_FILE}.service" "")
-file(APPEND "${PROJECT_FILE}.service"
+file(WRITE "${PROJECT_FILE}.service"
 "[Unit]\n"
 "Description=Force reconnect USB Ethernet\n"
 "After=network.target\n\n"
@@ -45,32 +44,62 @@ install(
 
 set(PROJECT_CONFIG "usb_reset_config")
 
-file(WRITE "${PROJECT_FILE}.sh" "")
-file(APPEND "${PROJECT_FILE}.sh"
-"#!/bin/sh\n"
-"DEVICE=\"2c7c 0125\"\n" #"DEVICE_LIST=\(\n\t\"2c7c 0125\"\n\)"
-"echo \"USB reload usbreset\"\n"
-"sleep ${SLEEP}\n\n"
+file(WRITE "${PROJECT_FILE}.sh"
+"#!/bin/bash\n\n"
 
-# "for DEVICE in \"\${DEVICE_LIST[@]}\"; do\n\t"
-    "echo \"usbreset \${DEVICE}\"\n\t"
+# Список пристроїв для перезавантаження (VendorID ProductID Опис)
+"DEVICES=(\n"
+"    \"0bda 8152 'Realtek_Semiconductor_Corp._RTL8152_Fast_Ethernet_Adapter'\"\n"
+"    \"0bda 8153 'Realtek_Semiconductor_Corp._RTL8152_Fast_Ethernet_Adapter'\"\n"
+# "    \"0483 5740 'STM32_Device'\"\n"
+# "    \"1d6b 0002 USB_Hub\"\n"
+")\n\n"
 
-    "sudo udevadm trigger --action=change --subsystem-match=usb "
-    "--attr-match \\\n\tidVendor=\$(echo \"\$DEVICE\" | awk '{print \$1}') "
-    "--attr-match \\\n\tidProduct=\$(echo \"\$DEVICE\" | awk '{print \$2}')\n\t"
+"echo \"=== USB Device Reset Utility ===\"\n"
+"echo \"Кількість пристроїв для перезавантаження: \$\{#DEVICES[@]\}\"\n"
+"echo \"\"\n\n"
 
-    "sleep ${SLEEP}\n"
-    # "done\n"
+# Очікування перед початком
+"sleep 3\n\n"
+
+" for DEVICE_ENTRY in \"\$\{DEVICES[@]\}\"; do\n"
+"     # Розбираємо запис пристрою\n"
+"     VENDOR_ID=$(echo \"$DEVICE_ENTRY\" | awk '{print $1}')\n"
+"     PRODUCT_ID=$(echo \"$DEVICE_ENTRY\" | awk '{print $2}')\n"
+"     DEVICE_DESC=$(echo \"$DEVICE_ENTRY\" | awk '{$1=$2=\"\"; print $0}' | xargs)\n"
+"\n"
+"     echo \"----------------------------------------\"\n"
+"     echo \"Пристрій: \$\{DEVICE_DESC:-Без опису\}\"\n"
+"     echo \"VendorID: $VENDOR_ID, ProductID: $PRODUCT_ID\"\n"
+"\n"
+    # Перезавантаження пристрою
+"     if sudo udevadm trigger --action=change \\\n"
+"         --subsystem-match=usb \\\n"
+"         --attr-match=\"idVendor=$VENDOR_ID\" \\\n"
+"         --attr-match=\"idProduct=$PRODUCT_ID\" 2>/dev/null; then\n"
+"         echo \"Статус: Успішно перезавантажено\"\n"
+"     else\n"
+"         echo \"Статус: Помилка при перезавантаженні\"\n"
+"     fi\n"
+"\n"
+    # Затримка між операціями
+"     sleep 2\n"
+"done\n"
+
+"echo \"----------------------------------------\"\n"
+"echo \"Процес перезавантаження завершено!\"\n"
+"echo \"Остаточне очікування...\"\n"
+"sleep 4"
 )
 
 install(
     PROGRAMS "${PROJECT_FILE}.sh" 
     DESTINATION /usr/local/bin)
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh" "")
-file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh"
-"DEVICE_LIST=\(\n\t\"2c7c 0125\"\n\)"
-)
+# file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh" "")
+# file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh"
+# "DEVICE_LIST=\(\n\t\"2c7c 0125\"\n\)"
+# )
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/postinst" "")
 file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/postinst"
