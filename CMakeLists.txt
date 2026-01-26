@@ -27,7 +27,7 @@ file(WRITE ${PROJECT_BINARY_DIR}/.gitignore
 file(WRITE "${PROJECT_FILE}.service"
 "[Unit]\n"
 "Description=Force reconnect USB Ethernet\n"
-"After=network.target\n\n"
+"After=multi-user.target\n\n"
 
 "[Service]\n"
 "Type=oneshot\n"
@@ -60,7 +60,7 @@ file(WRITE "${PROJECT_FILE}.sh"
 "echo \"\"\n\n"
 
 # Очікування перед початком
-"sleep 3\n\n"
+"sleep 15\n\n"
 
 " for DEVICE_ENTRY in \"\$\{DEVICES[@]\}\"; do\n"
 "     # Розбираємо запис пристрою\n"
@@ -89,7 +89,10 @@ file(WRITE "${PROJECT_FILE}.sh"
 "echo \"----------------------------------------\"\n"
 "echo \"Процес перезавантаження завершено!\"\n"
 "echo \"Остаточне очікування...\"\n"
-"sleep 4"
+"sleep 4\n"
+"# Для Raspberry Pi 4 (скидає живлення на всіх USB портах одразу)\n"
+"sudo uhubctl -l 2 -a cycle\n"
+
 )
 
 install(
@@ -101,8 +104,7 @@ install(
 # "DEVICE_LIST=\(\n\t\"2c7c 0125\"\n\)"
 # )
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/postinst" "")
-file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/postinst"
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/postinst"
 "#!/bin/sh\n\n"
 "sudo systemctl daemon-reload\n"
 "sudo systemctl enable usbresetservice.service\n"
@@ -114,17 +116,17 @@ file(CHMOD "${CMAKE_CURRENT_BINARY_DIR}/postinst"
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
     GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
-file(CHMOD "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh" 
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
-    GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+# file(CHMOD "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh" 
+#     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+#     GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 file(CHMOD "${PROJECT_FILE}.sh" 
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
     GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
-install(
-    PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh" 
-    DESTINATION /usr/local/etc/)
+# install(
+#     PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_CONFIG}.sh" 
+#     DESTINATION /usr/local/etc/)
 
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_BINARY_DIR}/postinst"
